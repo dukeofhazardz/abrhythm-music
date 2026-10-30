@@ -7,22 +7,18 @@ import {
   useScroll,
 } from "motion/react";
 import { Menu, MessageCircle, X } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { cn } from "@/lib/cn";
 import { useReducedMotionSafe } from "@/lib/use-reduced-motion";
 import { lockScroll, unlockScroll } from "@/lib/scroll";
+import { scrollToHash } from "@/lib/scroll";
 import { WHATSAPP_PRIMARY } from "@/lib/whatsapp";
-
-const LINKS = [
-  { label: "Training", href: "#training" },
-  { label: "Kids", href: "#kids" },
-  { label: "Approach", href: "#approach" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
-] as const;
+import { NAV_LINKS, isNavLinkActive, resolveNavHref } from "@/data/nav";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -31,6 +27,11 @@ export function Header() {
   const menuRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotionSafe();
   const { scrollY } = useScroll();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  /** Gallery is a paper/white page, so the header must stay opaque at all times. */
+  const isGallery = pathname === "/gallery";
 
   useMotionValueEvent(scrollY, "change", (v) => {
     setScrolled((prev) => {
@@ -38,6 +39,27 @@ export function Header() {
       return prev === next ? prev : next;
     });
   });
+
+  /**
+   * Navigate to a home-page section from any route. On "/" the native hash
+   * anchor is handled by SmoothScroll (Lenis offset). From another route we
+   * navigate home and scroll once the new page is mounted, keeping the
+   * Lenis header offset.
+   */
+  function handleSectionLink(e: React.MouseEvent, hash: string) {
+    if (pathname === "/") return; // native anchor; SmoothScroll handles it
+    e.preventDefault();
+    setOpen(false);
+    router.push("/");
+    // Next's push() is fire-and-forget; poll until the home page is mounted
+    // and the target section exists, then scroll with the Lenis offset.
+    let attempts = 0;
+    const tryScroll = () => {
+      if (scrollToHash(hash) || attempts++ > 30) return;
+      requestAnimationFrame(tryScroll);
+    };
+    requestAnimationFrame(tryScroll);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -58,15 +80,15 @@ export function Header() {
         toggleNode?.focus();
       }
     };
-  }, [open ]);
+  }, [open]);
 
   return (
     <>
       <header
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-200 ease-out",
-          scrolled || open
-            ? "border-b border-cream/10 bg-ink-bg/85 backdrop-blur-md"
+          scrolled || open || isGallery
+            ? "border-b border-cream/10 bg-ink-bg backdrop-blur-md"
             : "border-b border-transparent bg-transparent",
         )}
       >
@@ -90,19 +112,37 @@ export function Header() {
           </a>
 
           <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
-            {LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="mono-label pressable group relative inline-flex min-h-[44px] items-center px-2 -mx-2 py-2 text-cream-soft transition-colors duration-200 ease-out hover:text-cream"
-              >
-                {link.label}
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-x-2 -bottom-px h-px origin-left scale-x-0 bg-accent-ink transition-transform duration-200 ease-out group-hover:scale-x-100"
-                />
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const active = isNavLinkActive(link, pathname);
+              const href = resolveNavHref(link, pathname);
+              const isSection = !link.href;
+              const Element = link.href ? Link : "a";
+              return (
+                <Element
+                  key={link.href ?? link.hash}
+                  href={href}
+                  {...(isSection && pathname !== "/"
+                    ? { onClick: (e) => handleSectionLink(e, link.hash) }
+                    : {})}
+                  className={cn(
+                    "pressable group relative inline-flex min-h-[44px] items-center px-2 -mx-2 py-2 transition-colors duration-200 ease-out",
+                    active ? "text-cream" : "text-cream-soft",
+                    active ? "scale-x-100" : "hover:text-cream",
+                  )}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {link.label}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "absolute inset-x-2 -bottom-px h-px origin-left bg-accent-ink transition-transform duration-200 ease-out",
+                      active ? "scale-x-100" : "scale-x-0",
+                      !active ? "group-hover:scale-x-100" : undefined,
+                    )}
+                  />
+                </Element>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
@@ -162,32 +202,44 @@ export function Header() {
               <Container>
                 <nav aria-label="Mobile">
                   <ul className="divide-y divide-cream/10 border-y border-cream/10">
-                    {LINKS.map((link, i) => (
-                      <motion.li
-                        key={link.href}
-                        initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
-                        animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                        transition={{
-                          duration: 0.5,
-                          delay: reduce ? 0 : 0.08 + i * 0.06,
-                          ease: [0.16, 1, 0.3, 1],
-                        }}
-                      >
-                        <a
-                          href={link.href}
-                          onClick={() => setOpen(false)}
-                          className="pressable flex min-h-[60px] items-center justify-between py-3"
+                    {NAV_LINKS.map((link, i) => {
+                      const active = isNavLinkActive(link, pathname);
+                      const href = resolveNavHref(link, pathname);
+                      const isSection = !link.href;
+                      const Element = link.href ? Link : "a";
+                      return (
+                        <motion.li
+                          key={link.href ?? link.hash}
+                          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+                          animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                          transition={{
+                            duration: 0.5,
+                            delay: reduce ? 0 : 0.08 + i * 0.06,
+                            ease: [0.16, 1, 0.3, 1],
+                          }}
                         >
-                          <span className="font-display text-4xl leading-none">
-                            {link.label}
-                          </span>
-                          <span className="mono-label text-accent-ink">
-                            0{i + 1}
-                          </span>
-                        </a>
-                      </motion.li>
-                    ))}
+                          <Element
+                            href={href}
+                            {...(isSection && pathname !== "/"
+                              ? { onClick: (e) => handleSectionLink(e, link.hash) }
+                              : {})}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "pressable flex min-h-[60px] items-center justify-between py-3",
+                              active ? "text-accent" : "text-cream",
+                            )}
+                          >
+                            <span className="font-display text-4xl leading-none">
+                              {link.label}
+                            </span>
+                            <span className="mono-label text-accent-ink">
+                              0{i + 1}
+                            </span>
+                          </Element>
+                        </motion.li>
+                      );
+                    })}
                   </ul>
                 </nav>
                 <motion.div
@@ -196,7 +248,7 @@ export function Header() {
                   exit={{ opacity: 0, transition: { duration: 0.15 } }}
                   transition={{
                     duration: 0.5,
-                    delay: reduce ? 0 : 0.08 + LINKS.length * 0.06,
+                    delay: reduce ? 0 : 0.08 + NAV_LINKS.length * 0.06,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                   className="mt-8"

@@ -1,10 +1,10 @@
 import { ArrowDown, MessageCircle } from "lucide-react";
+import Image from "next/image";
 import { Container } from "@/components/layout/Container";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Marquee } from "@/components/motion/Marquee";
 import { SplitText } from "@/components/motion/SplitText";
 import { Reveal } from "@/components/motion/Reveal";
-import { PlaceholderSlab } from "@/components/ui/PlaceholderSlab";
 import { PulseLine } from "@/components/sections/PulseLine";
 import { WHATSAPP_PRIMARY } from "@/lib/whatsapp";
 import { site } from "@/lib/site";
@@ -35,7 +35,7 @@ export function Hero() {
       </div>
 
       <Container className="relative grid grid-cols-1 items-center gap-10 pt-28 pb-14 md:pt-36 lg:grid-cols-12 lg:pb-20">
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-6">
           <p className="mono-label text-accent-ink">
             {site.name} — Aba, Nigeria
           </p>
@@ -73,13 +73,16 @@ export function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.3} y={24} className="lg:col-span-5">
+        <Reveal delay={0.3} y={24} className="lg:col-span-6">
           <div className="relative">
-            <PlaceholderSlab
-              variant="vinyl"
-              slot="hero"
-              aspect="4/3"
-              label="Hero — drums & ensemble"
+            <Image
+              src="/images/hero.png"
+              alt="Abrhythm Music — students in training"
+              width={800}
+              height={600}
+              priority
+              className="block w-full h-full object-cover rounded-lg"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
             />
             <p className="mono-label mt-3 text-cream-soft">
               01 / Percussion — Drums

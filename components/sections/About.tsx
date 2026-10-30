@@ -1,4 +1,4 @@
-import { Quote } from "lucide-react";
+import { ArrowUpRight, Quote } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitText } from "@/components/motion/SplitText";
@@ -27,6 +27,16 @@ export function About() {
                 <p key={paragraph.slice(0, 32)}>{paragraph}</p>
               ))}
             </div>
+            <Reveal delay={0.14} className="mt-4">
+              <a
+                href="/gallery"
+                className="pressable inline-flex items-center gap-2 mono-label text-accent-deep link-underline"
+                aria-label="View gallery"
+              >
+                View our gallery
+                <ArrowUpRight size={13} strokeWidth={2} aria-hidden="true" />
+              </a>
+            </Reveal>
           </Reveal>
 
           <Reveal delay={0.18} className="lg:col-span-5">

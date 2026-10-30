@@ -27,6 +27,8 @@ npm run typecheck  # tsc --noEmit
 | Variable | Purpose | Default |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, OG images, sitemap, robots | Vercel URL, else `http://localhost:3000` |
+| `GOOGLE_DRIVE_API_KEY` | Google Drive API key for automatic gallery sync (`lib/drive.ts` MODE A). Optional — falls back to manual file lists in `data/gallery.ts` | (unset) |
+
 
 ## Deploy (Vercel)
 
@@ -50,6 +52,10 @@ npm run typecheck  # tsc --noEmit
 - [ ] **Class schedules** — no timetable exists yet; add a real one before
   publishing any dates or times.
 - [ ] **Fees** — no prices exist yet; never publish invented prices.
+- [ ] **Gallery Drive links** — paste Google Drive folder links into
+  `data/gallery.ts` (folder IDs are extracted automatically) and set
+  `GOOGLE_DRIVE_API_KEY` to enable automatic MODE A sync. Without them the
+  gallery runs in MODE B using the manually listed file IDs.
 
 ## Accessibility notes
 
