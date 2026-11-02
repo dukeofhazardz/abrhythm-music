@@ -7,32 +7,33 @@ import { Container } from "@/components/layout/Container";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitText } from "@/components/motion/SplitText";
-import { PlaceholderSlab, type SlabVariant } from "@/components/ui/PlaceholderSlab";
+import Image from "next/image";
 import { trainingServices, type TrainingService } from "@/data/services";
 import { cn } from "@/lib/cn";
 import { useReducedMotionSafe } from "@/lib/use-reduced-motion";
 import { waEnquire } from "@/lib/whatsapp";
 
 interface ServiceArt {
-  variant: SlabVariant;
   /** Distinct accent shade per card. */
   bar: string;
   /** Short caption for the art slot. */
   caption: string;
+  /** Real photo filename in /public/images (e.g. "drums.webp"). */
+  image: string;
 }
 
-/** Unique placeholder-art pairing per discipline (variant + accent). */
+/** Real photo per discipline (filename + accent). */
 const ART: ServiceArt[] = [
-  { variant: "drumskin", bar: "bg-accent", caption: "Drums" },
-  { variant: "keys", bar: "bg-ink", caption: "Piano" },
-  { variant: "reed", bar: "bg-secondary", caption: "Winds" },
-  { variant: "staff", bar: "bg-accent-deep", caption: "Strings" },
-  { variant: "vinyl", bar: "bg-accent", caption: "Voice" },
-  { variant: "keys", bar: "bg-secondary", caption: "Kids" },
-  { variant: "drumskin", bar: "bg-ink", caption: "Live Band" },
-  { variant: "staff", bar: "bg-accent", caption: "Marching" },
-  { variant: "reed", bar: "bg-accent-deep", caption: "Songwriting" },
-  { variant: "vinyl", bar: "bg-secondary", caption: "Oratory" },
+  { bar: "bg-accent", caption: "Drums", image: "drums.webp" },
+  { bar: "bg-ink", caption: "Piano", image: "piano.webp" },
+  { bar: "bg-secondary", caption: "Winds", image: "wind.webp" },
+  { bar: "bg-accent-deep", caption: "Strings", image: "strings.webp" },
+  { bar: "bg-accent", caption: "Voice", image: "voice.webp" },
+  { bar: "bg-secondary", caption: "Kids", image: "kids-training.webp" },
+  { bar: "bg-ink", caption: "Live Band", image: "live-band.webp" },
+  { bar: "bg-accent", caption: "Marching", image: "marching.webp" },
+  { bar: "bg-accent-deep", caption: "Songwriting", image: "songwriting.webp" },
+  { bar: "bg-secondary", caption: "Oratory", image: "oratory.webp" },
 ];
 
 function ServiceCopy({ service }: { service: TrainingService }) {
@@ -87,12 +88,16 @@ function ServiceArt({
   className?: string;
 }) {
   return (
-    <div className={cn("relative", className)}>
-      <PlaceholderSlab
-        variant={art.variant}
-        slot={`training-${service.slug}`}
-        aspect="4/3"
-        label={`${service.index} / ${art.caption}`}
+    <div className={cn("relative overflow-hidden rounded-lg", className)}>
+      <Image
+        src={`/images/${art.image}`}
+        alt={`${art.caption} — Abrhythm Music training`}
+        width={800}
+        height={600}
+        priority={service.slug === trainingServices[0].slug}
+        className="block w-full h-full object-cover"
+        style={{ aspectRatio: "4 / 3" }}
+        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
       />
       <span
         aria-hidden="true"
