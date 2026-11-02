@@ -6,9 +6,9 @@ import { site } from "@/lib/site";
 import { WHATSAPP_ALT, WHATSAPP_PRIMARY } from "@/lib/whatsapp";
 
 const SOCIALS = [
-  { label: "Facebook", href: "#" },
-  { label: "Instagram", href: "#" },
-  { label: "TikTok", href: "#" },
+  { label: "Facebook", href: "https://www.facebook.com/AbrhythmMusic" },
+  { label: "Instagram", href: "https://www.instagram.com/abrhythm_music" },
+  { label: "TikTok", href: "https://www.tiktok.com/@abrhythm_music" },
 ] as const;
 
 /* TODO(social): replace "#" hrefs above with the real

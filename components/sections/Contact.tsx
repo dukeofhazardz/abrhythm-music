@@ -40,9 +40,9 @@ type WhoForValue = (typeof WHO_FOR)[number]["value"];
 /* TODO: replace "#" hrefs with the real Facebook / Instagram / TikTok
    profile URLs for Abrhythm Music. */
 const SOCIALS = [
-  { label: "Facebook", href: "#" },
-  { label: "Instagram", href: "#" },
-  { label: "TikTok", href: "#" },
+  { label: "Facebook", href: "https://www.facebook.com/AbrhythmMusic" },
+  { label: "Instagram", href: "https://www.instagram.com/abrhythm_music" },
+  { label: "TikTok", href: "https://www.tiktok.com/@abrhythm_music" },
 ] as const;
 
 const MAPS_QUERY = "69A Aba-Owerri Road, Umungasi, Aba";
