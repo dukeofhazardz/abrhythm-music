@@ -97,6 +97,8 @@ export function Footer() {
                 <li key={social.label}>
                   <a
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="pressable group inline-flex min-h-[44px] items-center gap-2"
                     aria-label={`${social.label} Abrhythm Music (link coming soon)`}
                   >

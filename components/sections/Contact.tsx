@@ -221,6 +221,8 @@ export function Contact() {
                     <li key={social.label}>
                       <a
                         href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         aria-label={`${social.label} Abrhythm Music (link coming soon)`}
                         className="pressable group inline-flex min-h-[44px] items-center gap-2"
                       >
